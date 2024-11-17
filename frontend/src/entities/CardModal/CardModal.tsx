@@ -4,7 +4,8 @@ import Modal from "antd/lib/modal/Modal";
 import { Button } from "antd";
 import Form, { useForm } from "antd/lib/form/Form";
 import Input from "antd/lib/input/Input";
-import { ModalProps } from "antd/lib";
+
+import { ModalProps, Spin } from "antd/lib";
 import axios from "axios";
 import { CardsContext } from "../../pages/MainPage/MainPage";
 
@@ -18,33 +19,42 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 	const [prompt, setPrompt] = useState("");
 	const [form] = useForm();
 
+	const [isLoading, setIsLoading] = useState(false);
+
 	const handleChange = (type: string) => {
-		axios.post("http://51.250.91.130:5000/action", { id, type }).then(result => {
-			console.log(result);
+		setIsLoading(true);
+		axios.post("http://localhost:5000/action", { id, type, url: resultCards.find(item => item.id === id)?.url }).then(result => {
 			if (setResultCards) {
 				const prev = [...resultCards];
-				const prevInd = prev.findIndex(item => item.id === id);
-				if (prevInd) {
-					const item = {...prev[prevInd], url: result.data.url};
+				const prevInd = prev.findIndex(item => item.id == id);
+				console.log(prevInd);
+				if (prevInd !== -1) {
+					const item = {...prev[prevInd], url: result.data[0].url};
 					prev[prevInd] = item;
+					console.log(prev);
 					setResultCards(prev);
 				}
 			}
+			setIsLoading(false);
 		});
 	};
 
 	const handlePrompt = (prompt: string) => {
-		axios.post("http://51.250.91.130:5000/prompt", { id, prompt }).then(result => {
+		setIsLoading(true);
+		axios.post("http://81.94.159.242:5000/prompt", { id, prompt, url: resultCards.find(item => item.id === id)?.url }).then(result => {
 			console.log(result);
 			if (setResultCards) {
 				const prev = [...resultCards];
 				const prevInd = prev.findIndex(item => item.id === id);
-				if (prevInd) {
-					const item = {...prev[prevInd], url: result.data.url};
+
+				if (prevInd !== -1) {
+					const item = {...prev[prevInd], url: result.data[0].url};
 					prev[prevInd] = item;
+					console.log(prev);
 					setResultCards(prev);
 				}
 			}
+			setIsLoading(false);
 		});
 	};
 
@@ -63,14 +73,14 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 				</Button>
 			</Form>
 			<div className={styles.group}>
-				<img src={src} className={styles.group__image} alt="item" />
+				{isLoading ? <Spin/> : (
+					<img src={src} className={styles.group__image} alt="item" />
+				)}
 				<div className={styles.group__left}>
 					<Button type="primary" onClick={() => handleChange("white")} className={styles.changeButton}>
 						White background
 					</Button>
-					<Button type="primary" onClick={() => handleChange("context")} className={styles.changeButton}>
-						Context background
-					</Button>
+
 					<Button type="primary" onClick={() => handleChange("info")} className={styles.changeButton}>
 						Delete infographics
 					</Button>

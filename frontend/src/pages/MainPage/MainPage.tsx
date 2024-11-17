@@ -41,7 +41,8 @@ const MainPage = () => {
 						items={menuItems}
 					/>
 				</div>
-				{current === "src" ? <SourceTab /> : <ResultTab />}
+				{/*{current === "src" ? <SourceTab /> : <ResultTab />}*/}
+				{current === "src" ? <SourceTab setTab={setCurrent} /> : <ResultTab />}
 			</div>
 		</CardsContext.Provider>
 	);

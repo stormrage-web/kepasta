@@ -4,12 +4,16 @@ import UploadForm from "../../widgets/UploadForm/UploadForm";
 import CardGroup from "../../widgets/CardGroup/CardGroup";
 import { CardsContext } from "../../pages/MainPage/MainPage";
 
-const SourceTab = () => {
+export interface SourceTabProps {
+	setTab: (x: string) => void;
+}
+
+const SourceTab = ({setTab}: SourceTabProps) => {
 	const [cards] = useContext(CardsContext);
 
 	return (
 		<>
-			<UploadForm />
+			<UploadForm setTab={setTab} />
 			<CardGroup items={cards}/>
 		</>
 	);
