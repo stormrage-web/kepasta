@@ -18,7 +18,7 @@ const UploadForm = ({ setTab }: UploadFormProps) => {
 	const props: UploadProps = {
 		name: "file",
 		accept: ".json",
-		action: "http://51.250.91.130:5000/source",
+		action: "http://localhost:5000/source",
 		headers: {
 			"Content-Type": "application/json",
 		},

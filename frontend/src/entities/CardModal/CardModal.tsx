@@ -21,7 +21,7 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 
 	const handleChange = (type: string) => {
 		setIsLoading(true);
-		axios.post("http://51.250.91.130:5000/action", { id, type, url: resultCards.find(item => item.id === id)?.url }).then(result => {
+		axios.post("http://localhost:5000/action", { id, type, url: resultCards.find(item => item.id === id)?.url }).then(result => {
 			if (setResultCards) {
 				const prev = [...resultCards];
 				const prevInd = prev.findIndex(item => item.id == id);
