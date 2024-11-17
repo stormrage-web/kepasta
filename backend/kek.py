@@ -21,7 +21,6 @@ from io import BytesIO
 
 import uuid
 
-
 from ml.ml import REMOVE_INFOGRAPHICS, REMOVE_BACKGR
 
 from db_init import *
@@ -36,6 +35,7 @@ from sqlalchemy.orm import sessionmaker
 class PromptRequest(BaseModel):
     url: str
     prompt: str
+
 
 class ActionRequest(BaseModel):
     url: str
@@ -65,6 +65,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/source")
 async def source(files: str):
     print(json.loads(unquote(files)))
@@ -80,6 +81,7 @@ async def source(files: str):
             ]
         },
     ])
+
 
 @app.post("/prompt")
 async def prompt(prompt_images: PromptRequest):
@@ -108,9 +110,7 @@ async def action(action_images: ActionRequest):
     return [
         {
             "id": 8800553535,
-
-            #"url": f"http://51.250.91.130:8000/{saved_id}.png"
-              "url": f"http://localhost:8000/{saved_id}.png"
+            "url": f"http://localhost:8000/{saved_id}.png"
         },
     ]
 

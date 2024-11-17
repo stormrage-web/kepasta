@@ -145,7 +145,6 @@ USE_FORWARD_ENERGY = True                 # if True, use forward energy algorith
 # download_model(LAMA_MODEL_URL)
 device = torch.device("cpu")
 model_path = "C:/Users/admin/.cache/torch/hub/checkpoints/big-lama.pt"
-
 model = torch.jit.load(model_path, map_location="cpu")
 model = model.to(device)
 model.eval()
@@ -587,7 +586,6 @@ def REMOVE_INFOGRAPHICS(a_img):
         get_foreground_as_black_oil(a_img, remove_background).astype('float32'),
         pipeline
     )
-
     return np.array(process_inpaint(
             a_img,
             np.dstack((zeros,) * 3 + (img_text_removed,))
@@ -595,5 +593,3 @@ def REMOVE_INFOGRAPHICS(a_img):
 
 def REMOVE_BACKGR(a_img):
     return remover.process(a_img)
-
-

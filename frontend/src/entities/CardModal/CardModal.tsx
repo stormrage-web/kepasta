@@ -4,7 +4,6 @@ import Modal from "antd/lib/modal/Modal";
 import { Button } from "antd";
 import Form, { useForm } from "antd/lib/form/Form";
 import Input from "antd/lib/input/Input";
-
 import { ModalProps, Spin } from "antd/lib";
 import axios from "axios";
 import { CardsContext } from "../../pages/MainPage/MainPage";
@@ -18,12 +17,11 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 	const [,,resultCards, setResultCards] = useContext(CardsContext);
 	const [prompt, setPrompt] = useState("");
 	const [form] = useForm();
-
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleChange = (type: string) => {
 		setIsLoading(true);
-		axios.post("http://localhost:5000/action", { id, type, url: resultCards.find(item => item.id === id)?.url }).then(result => {
+		axios.post("http://51.250.91.130:5000/action", { id, type, url: resultCards.find(item => item.id === id)?.url }).then(result => {
 			if (setResultCards) {
 				const prev = [...resultCards];
 				const prevInd = prev.findIndex(item => item.id == id);
@@ -46,7 +44,6 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 			if (setResultCards) {
 				const prev = [...resultCards];
 				const prevInd = prev.findIndex(item => item.id === id);
-
 				if (prevInd !== -1) {
 					const item = {...prev[prevInd], url: result.data[0].url};
 					prev[prevInd] = item;
@@ -80,7 +77,6 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 					<Button type="primary" onClick={() => handleChange("white")} className={styles.changeButton}>
 						White background
 					</Button>
-
 					<Button type="primary" onClick={() => handleChange("info")} className={styles.changeButton}>
 						Delete infographics
 					</Button>

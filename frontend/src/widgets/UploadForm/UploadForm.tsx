@@ -4,7 +4,6 @@ import Form, { useForm } from "antd/lib/form/Form";
 import Upload from "antd/lib/upload/Upload";
 import { Button, UploadProps } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-
 import { Collapse, message } from "antd/lib";
 import { CardsContext } from "../../pages/MainPage/MainPage";
 
@@ -15,11 +14,11 @@ export interface UploadFormProps {
 const UploadForm = ({ setTab }: UploadFormProps) => {
 	const [form] = useForm();
 	const [, setCards, , setResultCards] = useContext(CardsContext);
+
 	const props: UploadProps = {
 		name: "file",
 		accept: ".json",
-
-		action: "http://192.168.33.107:5000/source",
+		action: "http://51.250.91.130:5000/source",
 		headers: {
 			"Content-Type": "application/json",
 		},
