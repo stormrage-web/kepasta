@@ -1,5 +1,9 @@
 .idea/
 
+/alembic
+
+alembic.ini
+
 __pycache__/
 
 *.pyc
@@ -8,5 +12,6 @@ __pycache__/
 node_modules/
 dist/
 build/
+venv/
 *.log
 secrets.txt
