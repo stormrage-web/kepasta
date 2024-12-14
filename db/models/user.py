@@ -73,3 +73,21 @@ class User(Base):
     def __repr__(self):
         """Returns string representation of model instance"""
         return "<User {name!r}>".format(name=self.name)
+
+def parse_claims(token: str):
+    try:
+        claims = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        return claims
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+def validate_claims(claims):
+    print(claims["sub"], claims["full_name"], claims["exp"])
+    return (
+            claims["sub"] is not None and  # Проверяем наличие subject
+            claims["full_name"] is not None and  # Проверяем наличие issued at
+            claims["exp"] is not None and  # Проверяем наличие expiration
+            datetime.fromtimestamp(claims["exp"]) > datetime.utcnow()  # Проверяем, что токен не истек
+    )

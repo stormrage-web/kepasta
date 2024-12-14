@@ -24,12 +24,17 @@ import uuid
 from ml.ml import REMOVE_INFOGRAPHICS, REMOVE_BACKGR
 
 from db_init import *
-from db.schemas import user as user_dto  # , token, product, image, collection
-from db.models import user as user_model
+from db.schemas import user as user_dto, token as token_dto #, product, image, collection
+from db.models import user as user_model, token as token_model
 from db.services import user_service
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+from fastapi import Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+security = HTTPBearer()
 
 
 class PromptRequest(BaseModel):
@@ -67,7 +72,14 @@ app.add_middleware(
 
 
 @app.get("/source")
-async def source(files: str):
+async def source(files: str, credentials: HTTPAuthorizationCredentials = Security(security)):
+    access_token = credentials.credentials
+    claims = user_model.parse_claims(access_token)
+    if claims is None or not user_model.validate_claims(claims):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid access token"
+        )
     print(json.loads(unquote(files)))
     return JSONResponse([
         {
@@ -120,6 +132,14 @@ def signup(
         payload: user_dto.CreateUserSchema = Body(),
         session: Session = Depends(get_db)
 ):
+    user: user_model.User = user_service.get_user(session=session, email=payload.email)
+
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+
     payload.password = user_model.User.hash_password(payload.password)
     return user_service.create_user(session, user=payload)
 
@@ -140,20 +160,27 @@ def login(
 
         # Validate password and generate tokens directly in the method
     tokens = user.validate_password(payload.password)
+    access_token = tokens["access_token"]
+    refresh_token = tokens["refresh_token"]
+
+    session.add(token_model.Token(user_id=user.id, refresh_token=refresh_token))
+    session.commit()
 
     expires = datetime.utcnow() + timedelta(days=60)
     response.set_cookie(
         key="refresh_token",
-        value=tokens["refresh_token"],
+        value=refresh_token,
         httponly=True,
         domain="localhost",
         samesite="lax",
         expires=int(expires.timestamp())
     )
 
+    # response.headers["Authorization"] = f"Bearer {tokens['access_token']}"
+
     return {
-        "access_token": tokens["access_token"],
-        "refresh_token": tokens["refresh_token"]
+        "access_token": access_token,
+        "refresh_token": refresh_token
     }
 
 

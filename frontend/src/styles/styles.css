@@ -1,0 +1,247 @@
+html {
+    font-size: 20px;
+}
+
+@media (min-width: 977px) {
+    body { padding-top: 92px; } 
+}
+
+@media (max-width: 977px) {
+    body { padding-top: 150px; } 
+}
+
+.green-navbar {
+    background-color: #0aa845;
+    padding: 10px 0;
+}
+
+.container {
+    display: flex;
+    color: #FFFF00;
+}
+
+.green-navbar img {
+    width: 64px;
+    height: 64px;
+    margin-right: 10px;
+}
+
+.green-navbar ul {
+    display: table;
+}
+
+.green-navbar ul li {
+    display: table-cell;
+    vertical-align: middle;
+    
+}
+
+.green-navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.nav-right a:focus, .nav-right a:hover,.nav-right a:target{
+    color: #CEF6D2;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.nav-right {
+    margin-right: 20px;
+}
+
+.nav-right li {
+    padding: 0 20px;
+}
+
+.loginPage {
+    margin: 20px auto;
+    max-width: 500px;
+}
+
+.div-with-img {
+    display: block;
+    margin: auto 0;
+}
+
+.loginPage h3 {
+    color: #0aa845;
+    font-weight: bold;
+    text-align: center;
+}
+
+.green-btn, .green-btn:hover {
+    background-color: #0aa845;
+    color: #CEF6D2;
+    font-size: 20px;
+    display: block;
+    padding: 5px 25px;
+    margin: 0 auto;
+}
+
+.green-btn:hover, .light-btn:hover, .red-btn:hover {
+    font-weight: bold;
+}
+
+.light-btn, .light-btn:hover {
+    background-color: #CEF6D2;
+    font-size: 20px;
+    padding: 5px 25px;
+    color:#0aa845;
+    width: 100%;
+}
+
+.red-btn, .red-btn:hover {
+    background-color: #dc3545;
+    font-size: 20px;
+    padding: 5px 25px;
+    color: white;
+    width: 100%;
+}
+
+.link-register {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.light-link, .light-link:hover {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.green-link, .green-link:hover {
+    color: #0aa845;
+    text-decoration: none;
+}
+
+.green-link:hover, .light-link:hover{
+    font-weight: bold;
+}
+
+
+.light-link:focus, .nav-right a:hover,.nav-right a:target{
+    color: #CEF6D2;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+
+.register-form {
+    min-width: 400px;
+    background-color: #CEF6D2;
+}
+
+
+.patients-page {
+    margin: 20px 100px;
+}
+
+.patient-list {
+    margin-top: 30px;
+}
+
+.patient-card {
+    background-color: #CEF6D2;
+}
+
+.patient-name {
+    color:#0aa845;
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.patient-value {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+
+.patient-id-page{
+    margin: 0 auto;
+    position: relative;
+    max-width: 90%;
+    background-color: #CEF6D2;
+}
+
+.start-page{
+    margin: 0 auto;
+    position: relative;
+    padding: 20px 100px;
+    background-color: #CEF6D2;
+    text-align: justify;
+}
+
+@media (min-width: 977px) {
+    .patient-info-sticky {
+        top: 100px;
+    }
+    .patient-id-page, .notfound {
+        top: 30px;
+    }
+}
+
+@media (max-width: 977px) {
+    .patient-info-sticky {
+        top: 150px;
+    }
+    .patient-id-page, .notfound {
+        top: 60px;
+    }
+}
+
+.patient-info-column {
+    background-color: #0aa845;
+    color: white;
+    padding: 10px 30px;
+}
+
+.patient-plan-or-dynamic {
+    padding: 10px 30px;
+    background-color: #CEF6D2;
+}
+
+.green-header {
+    color:#0aa845;
+    font-weight: bold;
+}
+
+.dropdown {
+  display: inline-block;
+}
+
+.doctor-img {
+    position: relative;
+    width: 100%;
+}
+
+.apps-img {
+    display: block;
+    margin: 0 auto;
+    width: 70%;
+}
+
+.notfound{
+    margin: 0 auto;
+    position: relative;
+    width: 80%; 
+    height: 600px; 
+    overflow: hidden;
+}
+
+.notfound img {
+    margin: 0 auto;
+    display: block;
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.unauth {
+    position: relative;
+    width: 80%;
+    margin: 0 auto;
+}

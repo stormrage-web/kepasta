@@ -22,4 +22,7 @@ module.exports = {
 		quotes: ["error", "double"],
 		semi: ["error", "always"],
 	},
+	rules: {
+		"no-mixed-spaces-and-tabs": 0, // Disable rule
+	}
 };
