@@ -7,9 +7,13 @@ import time
 import cv2
 import math
 
-from PIL import Image
+# from PIL import Image
 
 from rembg import remove
+
+import os
+
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 import matplotlib.pyplot as plt
 import keras_ocr
@@ -25,10 +29,7 @@ from transparent_background import Remover
 
 import torch
 
-LAMA_MODEL_URL = os.environ.get(
-    "LAMA_MODEL_URL",
-    "https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt",
-)
+LAMA_MODEL_URL = "https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt"
 
 remover = Remover()
 
@@ -141,8 +142,9 @@ ENERGY_MASK_CONST = 100000.0              # large energy value for protective ma
 MASK_THRESHOLD = 10                       # minimum pixel intensity for binary mask
 USE_FORWARD_ENERGY = True                 # if True, use forward energy algorithm
 
+# download_model(LAMA_MODEL_URL)
 device = torch.device("cpu")
-model_path = "big-lama.pt"
+model_path = "C:/Users/admin/.cache/torch/hub/checkpoints/big-lama.pt"
 model = torch.jit.load(model_path, map_location="cpu")
 model = model.to(device)
 model.eval()
@@ -584,12 +586,10 @@ def REMOVE_INFOGRAPHICS(a_img):
         get_foreground_as_black_oil(a_img, remove_background).astype('float32'),
         pipeline
     )
-    return process_inpaint(
+    return np.array(process_inpaint(
             a_img,
             np.dstack((zeros,) * 3 + (img_text_removed,))
-        )
+        ))[:, :, ::-1].copy()
 
 def REMOVE_BACKGR(a_img):
     return remover.process(a_img)
-
-

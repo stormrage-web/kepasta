@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
 import json
 
-from fastapi import FastAPI, File
+from fastapi import FastAPI, File, Depends, Body, HTTPException, status, Response, APIRouter
 import uvicorn
+
+from typing import Dict
 
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -18,12 +21,21 @@ from io import BytesIO
 
 import uuid
 
-from ml import REMOVE_INFOGRAPHICS, REMOVE_BACKGR
+from ml.ml import REMOVE_INFOGRAPHICS, REMOVE_BACKGR
+
+from db_init import *
+from db.schemas import user as user_dto  # , token, product, image, collection
+from db.models import user as user_model
+from db.services import user_service
+from sqlalchemy.orm import Session
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 
 class PromptRequest(BaseModel):
     url: str
     prompt: str
+
 
 class ActionRequest(BaseModel):
     url: str
@@ -31,6 +43,18 @@ class ActionRequest(BaseModel):
 
 
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 origins = ["*"]
 app.add_middleware(
@@ -40,6 +64,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/source")
 async def source(files: str):
@@ -56,6 +81,7 @@ async def source(files: str):
             ]
         },
     ])
+
 
 @app.post("/prompt")
 async def prompt(prompt_images: PromptRequest):
@@ -84,9 +110,52 @@ async def action(action_images: ActionRequest):
     return [
         {
             "id": 8800553535,
-            "url": f"http://51.250.91.130:8000/{saved_id}.png"
+            "url": f"http://localhost:8000/{saved_id}.png"
         },
     ]
+
+
+@app.post("/user/register", response_model=user_dto.CreateUserSchema)
+def signup(
+        payload: user_dto.CreateUserSchema = Body(),
+        session: Session = Depends(get_db)
+):
+    payload.password = user_model.User.hash_password(payload.password)
+    return user_service.create_user(session, user=payload)
+
+
+@app.post("/user/login", response_model=Dict)
+def login(
+        payload: user_dto.UserLoginSchema = Body(),
+        session: Session = Depends(get_db),
+        response: Response = None
+):
+    try:
+        user: user_model.User = user_service.get_user(session=session, email=payload.email)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid user credentials"
+        )
+
+        # Validate password and generate tokens directly in the method
+    tokens = user.validate_password(payload.password)
+
+    expires = datetime.utcnow() + timedelta(days=60)
+    response.set_cookie(
+        key="refresh_token",
+        value=tokens["refresh_token"],
+        httponly=True,
+        domain="localhost",
+        samesite="lax",
+        expires=int(expires.timestamp())
+    )
+
+    return {
+        "access_token": tokens["access_token"],
+        "refresh_token": tokens["refresh_token"]
+    }
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000, log_level="info")

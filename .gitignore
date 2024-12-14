@@ -1,0 +1,17 @@
+.idea/
+
+/alembic
+
+alembic.ini
+
+__pycache__/
+
+*.pyc
+*.pyo
+.env
+node_modules/
+dist/
+build/
+venv/
+*.log
+secrets.txt
