@@ -6,7 +6,7 @@ export default class AuthService {
   }
 
   static async register(user) {
-    return guestApi.post("/auth/register-doctor", {
+    return guestApi.post("/auth/register", {
       email: user.email,
       password: user.password,
       name: user.name

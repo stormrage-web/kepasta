@@ -30,7 +30,7 @@ secureApi.interceptors.response.use(
     ) {
       originalRequest._isRetry = true;
       try {
-        const response = await guestApi.post(`${API_URL}/auth/refresh-web`, {
+        const response = await guestApi.post(`${API_URL}/auth/refresh`, {
             withCredentials: true
         });
         

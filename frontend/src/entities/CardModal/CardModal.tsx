@@ -39,7 +39,7 @@ const CardModal = ({src, id, ...props}: CardModadProps) => {
 
 	const handlePrompt = (prompt: string) => {
 		setIsLoading(true);
-		axios.post("http://81.94.159.242:5000/prompt", { id, prompt, url: resultCards.find(item => item.id === id)?.url }).then(result => {
+		axios.post("http://localhost:5000/prompt", { id, prompt, url: resultCards.find(item => item.id === id)?.url }).then(result => {
 			console.log(result);
 			if (setResultCards) {
 				const prev = [...resultCards];

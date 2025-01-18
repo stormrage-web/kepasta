@@ -84,7 +84,7 @@ def parse_claims(token: str):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 def validate_claims(claims):
-    print(claims["sub"], claims["full_name"], claims["exp"])
+    #print(claims["sub"], claims["full_name"], claims["exp"])
     return (
             claims["sub"] is not None and  # Проверяем наличие subject
             claims["full_name"] is not None and  # Проверяем наличие issued at

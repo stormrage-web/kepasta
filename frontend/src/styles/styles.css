@@ -1,247 +1,113 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
 html {
-    font-size: 20px;
+    font-size: 16px;
 }
 
-@media (min-width: 977px) {
-    body { padding-top: 92px; } 
-}
-
-@media (max-width: 977px) {
-    body { padding-top: 150px; } 
-}
-
-.green-navbar {
-    background-color: #0aa845;
-    padding: 10px 0;
-}
-
-.container {
-    display: flex;
-    color: #FFFF00;
-}
-
-.green-navbar img {
-    width: 64px;
-    height: 64px;
-    margin-right: 10px;
-}
-
-.green-navbar ul {
-    display: table;
-}
-
-.green-navbar ul li {
-    display: table-cell;
-    vertical-align: middle;
-    
-}
-
-.green-navbar a {
-    color: white;
-    text-decoration: none;
-    font-size: 20px;
-}
-
-.nav-right a:focus, .nav-right a:hover,.nav-right a:target{
-    color: #CEF6D2;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-.nav-right {
-    margin-right: 20px;
-}
-
-.nav-right li {
-    padding: 0 20px;
+body {
+    margin: 0;
 }
 
 .loginPage {
-    margin: 20px auto;
-    max-width: 500px;
-}
+    background-color: #f8f9fa;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-.div-with-img {
-    display: block;
-    margin: auto 0;
-}
+    .card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 20px;
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
 
-.loginPage h3 {
-    color: #0aa845;
-    font-weight: bold;
-    text-align: center;
-}
+        h3 {
+            color: black;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px; 
+        }
 
-.green-btn, .green-btn:hover {
-    background-color: #0aa845;
-    color: #CEF6D2;
-    font-size: 20px;
-    display: block;
-    padding: 5px 25px;
-    margin: 0 auto;
-}
+        .form-outline {
+            margin-bottom: 20px;
 
-.green-btn:hover, .light-btn:hover, .red-btn:hover {
-    font-weight: bold;
-}
+            label {
+                color: black;
+                font-weight: bold;
+                display: inline-block;
+                margin-bottom: 5px;
+                margin-left: 5px; 
+                font-size: 16px; 
+            }
 
-.light-btn, .light-btn:hover {
-    background-color: #CEF6D2;
-    font-size: 20px;
-    padding: 5px 25px;
-    color:#0aa845;
-    width: 100%;
-}
+            input {
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                padding: 12px; 
+                width: calc(100% - 24px);
+                transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
-.red-btn, .red-btn:hover {
-    background-color: #dc3545;
-    font-size: 20px;
-    padding: 5px 25px;
-    color: white;
-    width: 100%;
-}
+                &:focus {
+                    border-color: #000; 
+                    outline: none; 
+                    box-shadow: 0 0 5px rgba(0,0,0,0.5); 
+                }
+            }
+        }
 
-.link-register {
-    text-align: center;
-    margin-top: 20px;
-}
+        .btn {
+            background-color: black;
+            color: white;
+            border-radius: 4px;
+            padding: 12px 15px; 
+            cursor: pointer;
+            width: 100%;
 
-.light-link, .light-link:hover {
-    color: white;
-    text-decoration: none;
-    font-size: 20px;
-}
+            &:hover {
+                background-color: #333; 
+                transition: background-color 0.3s ease; 
+            }
+        }
 
-.green-link, .green-link:hover {
-    color: #0aa845;
-    text-decoration: none;
-}
+        .link-register {
+            text-align: center;
+            margin-top: 20px;
 
-.green-link:hover, .light-link:hover{
-    font-weight: bold;
-}
+            button {
+                background-color:'none'; 
+                border:'none'; 
+                color:'black'; 
+                cursor:'pointer';
+                text-decoration:'none';
 
+                &:hover {
+                    color:'#555';
+                    text-decoration:'underline'; 
+                }
+            }
+        }
 
-.light-link:focus, .nav-right a:hover,.nav-right a:target{
-    color: #CEF6D2;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-
-.register-form {
-    min-width: 400px;
-    background-color: #CEF6D2;
-}
-
-
-.patients-page {
-    margin: 20px 100px;
-}
-
-.patient-list {
-    margin-top: 30px;
-}
-
-.patient-card {
-    background-color: #CEF6D2;
-}
-
-.patient-name {
-    color:#0aa845;
-    font-size: 30px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.patient-value {
-    margin-bottom: 10px;
-    font-size: 20px;
-}
-
-
-.patient-id-page{
-    margin: 0 auto;
-    position: relative;
-    max-width: 90%;
-    background-color: #CEF6D2;
-}
-
-.start-page{
-    margin: 0 auto;
-    position: relative;
-    padding: 20px 100px;
-    background-color: #CEF6D2;
-    text-align: justify;
-}
-
-@media (min-width: 977px) {
-    .patient-info-sticky {
-        top: 100px;
-    }
-    .patient-id-page, .notfound {
-        top: 30px;
+        .error-message {
+            color: red; 
+            text-align: center; 
+            margin-top: 10px; 
+        }
     }
 }
 
-@media (max-width: 977px) {
-    .patient-info-sticky {
-        top: 150px;
-    }
-    .patient-id-page, .notfound {
-        top: 60px;
-    }
-}
-
-.patient-info-column {
-    background-color: #0aa845;
-    color: white;
-    padding: 10px 30px;
-}
-
-.patient-plan-or-dynamic {
-    padding: 10px 30px;
-    background-color: #CEF6D2;
-}
-
-.green-header {
-    color:#0aa845;
-    font-weight: bold;
-}
-
-.dropdown {
-  display: inline-block;
-}
-
-.doctor-img {
-    position: relative;
-    width: 100%;
-}
-
-.apps-img {
-    display: block;
-    margin: 0 auto;
-    width: 70%;
-}
-
-.notfound{
-    margin: 0 auto;
-    position: relative;
-    width: 80%; 
-    height: 600px; 
-    overflow: hidden;
-}
-
-.notfound img {
-    margin: 0 auto;
-    display: block;
-    position: relative;
-    max-width: 100%;
-    max-height: 100%;
-}
-
+.patients-page,
+.patient-list,
+.patient-card,
+.patient-id-page,
+.start-page,
+.notfound,
 .unauth {
-    position: relative;
-    width: 80%;
-    margin: 0 auto;
+   background-color: white; 
+   color: black; 
+   padding: 20px; 
+   border-radius: 8px; 
+   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; 
 }

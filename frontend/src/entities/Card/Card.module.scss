@@ -3,20 +3,19 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  width: calc(100% - 20px); // Уменьшение ширины для отступов
   padding: 10px;
-  border: 1px solid #000;
-  border-radius: 8px;
+  border: 1px solid #000; // Черная рамка
+  border-radius: 8px; // Закругление углов
 }
 
 .group {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  margin-top: 10px;
+  width: calc(100% - 20px); // Уменьшение ширины для отступов
 }
 
 .picture {
-  width: 100%;
+  width: calc(100% - 20px); // Уменьшение ширины для отступов
 }

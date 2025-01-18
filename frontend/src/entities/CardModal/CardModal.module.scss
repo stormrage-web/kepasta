@@ -1,3 +1,7 @@
+.wrapper {
+  background-color: #d9d9d9; // Серый фон
+}
+
 .form {
   display: flex;
   justify-content: space-between;
@@ -20,12 +24,16 @@
   &__image {
     flex: 0.8;
     max-width: 75%;
+    border-radius: 8px; // Закругление углов изображения
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.1); // Легкая тень для изображения
   }
 
   &__left {
     display: flex;
     flex-direction: column;
     flex: 0.15;
+    align-items: flex-start; // Выравнивание кнопок по левому краю
+    gap: 10px; // Промежуток между кнопками
   }
 }
 
@@ -37,7 +45,7 @@
 
 :global {
   .ant-modal-close {
-    color: #fff!important;
+    color: #000!important; // Черный цвет для кнопки закрытия
     top: -25px!important;
     right: -30px!important;
     z-index: 10000!important;

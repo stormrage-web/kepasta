@@ -6,6 +6,7 @@ import { privateRoutes, publicRoutes } from "../routes";
 
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import MainPage from "../pages/MainPage/MainPage";
 
 
 const AppRouter = () => {
@@ -41,19 +42,17 @@ const AppRouter = () => {
 
   return store.getAuth() ? (
     <Routes>
-      {/* {privateRoutes.map((route) => (
-        <Route path={route.path} key={route.path} element={route.element} exact={true}/>
-      ))} */}
-      <Route path="/register" key="/register" element={<RegisterPage />} />
-      <Route path="/login" key="/login" element={<LoginPage />} />
+      {privateRoutes.map((route) => (
+        <Route path={route.path} key={route.path} element={<route.component />} />
+      ))}
+      {/* <Route path="*" element={<ErrorPage />} /> */}
     </Routes>
   ) : (
     <Routes>
-      {/* {publicRoutes.map((route) => (
-        <Route path={route.path} key={route.path} element={route.component} />
-      ))} */}
-      <Route path="/register" key="/register" element={<RegisterPage />} />
-      <Route path="/login" key="/login" element={<LoginPage />} />
+      {publicRoutes.map((route) => (
+        <Route path={route.path} key={route.path} element={<route.component />} />
+      ))}
+      {/* <Route path="*" element={<ErrorPage />} /> */}
     </Routes>
   );
 };
