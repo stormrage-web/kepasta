@@ -1,5 +1,5 @@
-import Button from "antd/es/button";
 import React, { useState } from "react";
+import Button from "antd/es/button";
 import styles from "./Card.module.scss";
 import CardModal from "../CardModal/CardModal";
 
@@ -15,13 +15,25 @@ const Card = ({ url, name, modal, id }: CardProps) => {
 
 	return (
 		<div className={styles.wrapper}>
-			<img src={url} alt="item" className={styles.picture}/>
+			<img src={url} alt="item" className={styles.picture} />
 			<div className={styles.group}>
 				<p>{name}</p>
 				{modal && (
 					<>
-						<Button type="primary" onClick={() => setIsModalOpen(true)}>Change</Button>
-						<CardModal src={url} id={id} open={isModalOpen} onCancel={() => setIsModalOpen(false)} footer={[]}/>
+						<Button
+							type="default" // Use default type for a non-primary button
+							className={styles.customButton}
+							onClick={() => setIsModalOpen(true)}
+						>
+							Change
+						</Button>
+						<CardModal
+							src={url}
+							id={id}
+							open={isModalOpen}
+							onCancel={() => setIsModalOpen(false)}
+							footer={[]}
+						/>
 					</>
 				)}
 			</div>

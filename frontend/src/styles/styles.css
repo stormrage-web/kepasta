@@ -2,13 +2,14 @@
 
 html {
     font-size: 16px;
+    font-family: 'Monospace'; 
 }
 
 body {
     margin: 0;
 }
 
-.loginPage {
+.loginPage, .registerPage {
     background-color: #f8f9fa;
     height: 100vh;
     display: flex;
@@ -17,10 +18,10 @@ body {
 
     .card {
         background-color: white;
-        border-radius: 8px;
-        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 20px;
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 20px; /* Shadow effect */
         width: 100%;
-        max-width: 400px;
+        max-width: 400px; /* Set max width */
         padding: 30px;
 
         h3 {
@@ -98,16 +99,66 @@ body {
     }
 }
 
-.patients-page,
-.patient-list,
-.patient-card,
-.patient-id-page,
-.start-page,
-.notfound,
-.unauth {
-   background-color: white; 
-   color: black; 
-   padding: 20px; 
-   border-radius: 8px; 
-   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; 
+.errorPage {
+    background-color: #f8f9fa; /* Light gray background */
+    height: 100vh; /* Full height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .card {
+        background-color: white;
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 20px; /* Shadow effect */
+        width: 100%;
+        max-width: 400px; /* Set max width */
+        padding: 30px;
+
+        h3 {
+            color: black;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px; 
+        }
+
+        p {
+            color: black;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px; 
+        }
+
+        .btn {
+            background-color: black;
+            color: white;
+            border-radius: 4px;
+            padding: 12px 15px; 
+            cursor: pointer;
+            width: 100%;
+
+            &:hover {
+                background-color: #333; 
+                transition: background-color 0.3s ease; 
+            }
+        }
+
+        .link-home {
+            text-align: center;
+            margin-top: 20px;
+
+            button {
+                background-color:'none'; 
+                border:'none'; 
+                color:'black'; 
+                cursor:'pointer';
+                text-decoration:'none';
+
+                &:hover {
+                    color:'#555';
+                    text-decoration:'underline'; 
+                }
+            }
+        }
+    }
 }

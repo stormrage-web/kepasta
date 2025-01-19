@@ -190,16 +190,17 @@ def signup(
         payload: user_dto.CreateUserSchema = Body(),
         session: Session = Depends(get_db)
 ):
-    user: user_model.User = user_service.get_user(session=session, email=payload.email)
-
-    if user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-
-    payload.password = user_model.User.hash_password(payload.password)
-    return user_service.create_user(session, user=payload)
+    try:
+        user: user_model.User = user_service.get_user(session=session, email=payload.email)
+        # If the user is found, raise an HTTPException
+        if user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+    except Exception as e:
+        payload.password = user_model.User.hash_password(payload.password)
+        return user_service.create_user(session, user=payload)
 
 
 @app.post("/auth/login", response_model=Dict)
@@ -209,7 +210,6 @@ def login(
         response: Response = None
 ):
     try:
-        print(payload.email)
         user: user_model.User = user_service.get_user(session=session, email=payload.email)
     except Exception:
         raise HTTPException(

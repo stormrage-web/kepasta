@@ -1,12 +1,9 @@
 import React, { useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { Context } from "../index";
 import { privateRoutes, publicRoutes } from "../routes";
-
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
-import MainPage from "../pages/MainPage/MainPage";
+import ErrorPage from "../pages/ErrorPage";
 
 
 const AppRouter = () => {
@@ -45,14 +42,14 @@ const AppRouter = () => {
       {privateRoutes.map((route) => (
         <Route path={route.path} key={route.path} element={<route.component />} />
       ))}
-      {/* <Route path="*" element={<ErrorPage />} /> */}
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   ) : (
     <Routes>
+      <Route path="*" element={<Navigate to="/login" replace />} />
       {publicRoutes.map((route) => (
         <Route path={route.path} key={route.path} element={<route.component />} />
       ))}
-      {/* <Route path="*" element={<ErrorPage />} /> */}
     </Routes>
   );
 };
