@@ -17,3 +17,7 @@ def get_user(session: Session, email:str):
     return session.query(User).filter(User.email == email).one()
 
 
+def get_user_id(session: Session, id:str):
+    return session.query(User).filter(User.id == id).one()
+
+

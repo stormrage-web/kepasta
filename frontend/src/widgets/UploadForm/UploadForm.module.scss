@@ -1,22 +1,57 @@
+// .wrapper {
+//   width: max-content;
+//   padding: 10px;
+//   border: 1px solid #000;
+//   border-radius: 5px;
+// }
+
+// .title {
+//   margin-bottom: 10px;
+//   text-align: center;
+// }
+
+// .form {
+//   width: 100%;
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: flex-start;
+
+//   & > *:not(:last-child) {
+//     margin-right: 20px;
+//   }
+// }
+
 .wrapper {
-  width: max-content;
-  padding: 10px;
-  border: 1px solid #000;
-  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #ffffffd7; /* White background */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .title {
-  margin-bottom: 10px;
-  text-align: center;
+  font-family: 'Monospace'; 
+  letter-spacing: 2px;
+  font-size: 24px;
+  color: #333; /* Dark text color */
+  margin-bottom: 20px;
 }
 
 .form {
-  width: 100%;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+}
 
-  & > *:not(:last-child) {
-    margin-right: 20px;
-  }
+.uploadButton {
+  margin-top: 10px;
+}
+
+.jsonExample {
+  background-color: #f5f5f5; /* Light gray background for JSON example */
+  padding: 10px;
+  border-radius: 5px; /* Rounded corners */
+  text-align: left; /* Align text to the left */
+  width: 100%; /* Full width of the container */
 }
