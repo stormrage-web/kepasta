@@ -39,12 +39,14 @@ git clone https://github.com/stormrage-web/kepasta.git
 ```
 npm install
 npm start
+```
 
 5. Запустите в командной строке:
 
 ```
 cd backend
 python kek.py
+```
 
 ## Использование
 
