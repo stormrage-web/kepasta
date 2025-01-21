@@ -36,13 +36,15 @@ git clone https://github.com/stormrage-web/kepasta.git
 
 4. Откройте директорию /frontend в Visual Studio Code и запустите клиентскую часть приложения командами в терминале:
 
-```npm install
-npm start```
+```
+npm install
+npm start
 
 5. Запустите в командной строке:
 
-```cd backend
-python kek.py```
+```
+cd backend
+python kek.py
 
 ## Использование
 
