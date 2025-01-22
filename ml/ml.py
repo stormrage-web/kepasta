@@ -110,7 +110,6 @@ def pad_img_to_modulo(img, mod):
     )
 
 
-
 try:
     torch._C._jit_override_can_fuse_on_cpu(False)
     torch._C._jit_override_can_fuse_on_gpu(False)
