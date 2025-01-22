@@ -69,14 +69,29 @@ const CardModal = ({ src, id, open, onCancel, footer }: CardModalProps) => {
 		});
 	};
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = mainImage; // Use the current main image URL for download
-    link.setAttribute('download', 'main_image.jpg'); // Set a default filename for download
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(mainImage); // Fetch the image from the URL
+      const blob = await response.blob(); // Convert response to a Blob
+  
+      // Create a temporary URL for the Blob
+      const url = window.URL.createObjectURL(blob);
+  
+      // Create an anchor element and trigger download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'main_image.jpg'); // Set default file name
+      document.body.appendChild(link);
+      link.click();
+  
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url); // Revoke temporary URL
+    } catch (error) {
+      console.error('Error downloading the image:', error);
+    }
   };
+  
 
   return (
     <Modal
