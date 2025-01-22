@@ -136,7 +136,7 @@ const CardModal = ({ src, id, open, onCancel, footer }: CardModalProps) => {
           {/* Show download button only if the image is new */}
           {isNewImage && (
             <Button type="default" onClick={() => handleDownload()} className={styles.customButton}>
-              Download Main Image
+              Download
             </Button>
           )}
         </div>
