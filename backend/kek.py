@@ -24,10 +24,10 @@ import uuid
 
 from fastapi.responses import FileResponse
 
-from ml.ml import REMOVE_INFOGRAPHICS, REMOVE_BACKGR
+from ml.ml import REMOVE_INFOGRAPHICS, REMOVE_BACKGR, GENERATE_BACKGROUND_BY_PROMPT
 
 from db_init import *
-from db.schemas import user as user_dto, token as token_dto #, product, image, collection
+from db.schemas import user as user_dto, token as token_dto  # , product, image, collection
 from db.models import user as user_model, token as token_model
 from db.services import user_service
 from sqlalchemy.orm import Session
@@ -53,6 +53,7 @@ class ActionRequest(BaseModel):
 app = FastAPI()
 
 IMAGE_FOLDER = "images"
+
 
 @app.get("/images/{filename}")
 async def get_image(filename: str):
@@ -109,24 +110,42 @@ async def source(files: str, credentials: HTTPAuthorizationCredentials = Securit
 
 
 @app.post("/prompt")
-async def prompt(prompt_images: PromptRequest, credentials: HTTPAuthorizationCredentials = Security(security)):
-    access_token = credentials.credentials
-    claims = user_model.parse_claims(access_token)
-    if claims is None or not user_model.validate_claims(claims):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid access token"
-        )
+async def prompt(prompt_images: PromptRequest):  # , credentials: HTTPAuthorizationCredentials = Security(security)):
+    # access_token = credentials.credentials
+    # claims = user_model.parse_claims(access_token)
+    # if claims is None or not user_model.validate_claims(claims):
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Invalid access token"
+    #     )
+
+    saved_id = str(uuid.uuid4())
+
+    response = requests.get(prompt_images.url)
+    img = Image.open(BytesIO(response.content)).convert('RGB')
+    generated_img = GENERATE_BACKGROUND_BY_PROMPT(img, prompt_images.prompt)
+
+    if isinstance(generated_img, np.ndarray):
+        # Convert PIL Image to NumPy array
+        generated_img = Image.fromarray(generated_img)
+
+    import os
+    # Create directory if it doesn't exist
+    if not os.path.exists("images"):
+        os.makedirs("images")
+
+    generated_img.save(f"images/{saved_id}.png")
+
     return [
         {
             "id": 8800553535,
-            "url": "https://pofoto.club/uploads/posts/2022-08/1660343110_37-pofoto-club-p-zimorodok-foto-zimoi-44.jpg"
+            "url": f"http://localhost:5000/images/{saved_id}.png"
         },
     ]
 
 
 @app.post("/action")
-async def action(action_images: ActionRequest): #, credentials: HTTPAuthorizationCredentials = Security(security)):
+async def action(action_images: ActionRequest):  # , credentials: HTTPAuthorizationCredentials = Security(security)):
     # access_token = credentials.credentials
     # claims = user_model.parse_claims(access_token)
     # if claims is None or not user_model.validate_claims(claims):
@@ -137,52 +156,41 @@ async def action(action_images: ActionRequest): #, credentials: HTTPAuthorizatio
 
     saved_id = str(uuid.uuid4())
     if action_images.type == "info":
-        resp = requests.get(action_images.url, stream=True).raw
-        image = np.asarray(bytearray(resp.read()), dtype="uint8")
-        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-        no_info = REMOVE_INFOGRAPHICS(image)
-        if isinstance(no_info, Image.Image):
+        response = requests.get(action_images.url)
+        image = Image.open(BytesIO(response.content)).convert('RGB')
+
+        no_info = REMOVE_INFOGRAPHICS(np.array(image))
+
+        if isinstance(no_info, np.ndarray):
             # Convert PIL Image to NumPy array
-            no_info = np.array(no_info)
+            no_info = Image.fromarray(no_info)
 
-        # Ensure no_info is in the right format for OpenCV
-        if isinstance(no_info, np.ndarray) and no_info.size > 0:
+        import os
+        # Create directory if it doesn't exist
+        if not os.path.exists("images"):
+            os.makedirs("images")
 
-            if no_info.dtype != np.uint8:
-                no_info = no_info.astype(np.uint8)
-
-            import os
-            if not os.path.exists("images"):
-                os.makedirs("images")
-
-        cv2.imwrite(f"images/{saved_id}.png", no_info)
+        no_info.save(f"images/{saved_id}.png")
     if action_images.type == "white":
         response = requests.get(action_images.url)
         img = Image.open(BytesIO(response.content)).convert('RGB')
         no_info = REMOVE_BACKGR(img)
-        if isinstance(no_info, Image.Image):
+        if isinstance(no_info, np.ndarray):
             # Convert PIL Image to NumPy array
-            no_info = np.array(no_info)
+            no_info = Image.fromarray(no_info)
 
-        # Ensure no_info is in the right format for OpenCV
-        if isinstance(no_info, np.ndarray) and no_info.size > 0:
+        import os
+        # Create directory if it doesn't exist
+        if not os.path.exists("images"):
+            os.makedirs("images")
 
-            import os
-            # Ensure the data type is correct (uint8)
-            if no_info.dtype != np.uint8:
-                no_info = no_info.astype(np.uint8)
-
-            # Create directory if it doesn't exist
-            if not os.path.exists("images"):
-                os.makedirs("images")
-        cv2.imwrite(f"images/{saved_id}.png", no_info)
+        no_info.save(f"images/{saved_id}.png")
     return [
         {
             "id": 8800553535,
             "url": f"http://localhost:5000/images/{saved_id}.png"
         },
     ]
-
 
 
 @app.post("/auth/register", response_model=user_dto.CreateUserSchema)
@@ -242,6 +250,7 @@ def login(
         "refresh_token": refresh_token
     }
 
+
 @app.post("/refresh")
 def refresh(
         response: Response,
@@ -293,7 +302,6 @@ def refresh(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid user credentials"
         )
-
 
 
 if __name__ == "__main__":
