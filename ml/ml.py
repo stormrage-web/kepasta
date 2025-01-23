@@ -7,7 +7,10 @@ import time
 import cv2
 import math
 
-# from PIL import Image
+import tensorflow as tf
+
+from mtranslate import translate
+from urllib.error import HTTPError
 
 from rembg import remove
 
@@ -28,6 +31,18 @@ import multiprocessing
 from transparent_background import Remover
 
 import torch
+
+import random
+
+from controlnet_aux import ZoeDetector
+from PIL import Image, ImageOps
+
+from diffusers import (
+    AutoencoderKL,
+    ControlNetModel,
+    StableDiffusionXLControlNetPipeline,
+    StableDiffusionXLInpaintPipeline,
+)
 
 LAMA_MODEL_URL = "https://github.com/Sanster/models/releases/download/add_big_lama/big-lama.pt"
 
@@ -110,6 +125,7 @@ def pad_img_to_modulo(img, mod):
     )
 
 
+
 try:
     torch._C._jit_override_can_fuse_on_cpu(False)
     torch._C._jit_override_can_fuse_on_gpu(False)
@@ -142,9 +158,10 @@ MASK_THRESHOLD = 10                       # minimum pixel intensity for binary m
 USE_FORWARD_ENERGY = True                 # if True, use forward energy algorithm
 
 # download_model(LAMA_MODEL_URL)
-device = torch.device("cpu")
-model_path = "C:/Users/admin/.cache/torch/hub/checkpoints/big-lama.pt"
-model = torch.jit.load(model_path, map_location="cpu")
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+model_path = "/kavesnin/kepasta/ml/big-lama.pt"
+model = torch.jit.load(model_path, map_location=device)
 model = model.to(device)
 model.eval()
 
@@ -540,14 +557,14 @@ def midpoint(x1, y1, x2, y2):
     y_mid = int((y1 + y2)/2)
     return (x_mid, y_mid)
 
-def inpainted_text_mask(img, pipeline):
+def inpainted_text_mask(img, ocr_pipeline):
     # read the image
     # img = keras_ocr.tools.read(img_path)
 
     # Recogize text (and corresponding regions)
     # Each list of predictions in prediction_groups is a list of
     # (word, box) tuples.
-    prediction_groups = pipeline.recognize([img])
+    prediction_groups = ocr_pipeline.recognize([img])
 
     #Define the mask for inpainting
     mask = np.zeros(img.shape[:2], dtype="uint8")
@@ -569,7 +586,69 @@ def inpainted_text_mask(img, pipeline):
 
     return mask
 
-pipeline = keras_ocr.pipeline.Pipeline()
+def translate_google(text):
+    try:
+        result = translate(text)
+        return result
+    except HTTPError:
+        print('HTTPError')
+        return ''
+
+def scale_and_paste(original_image):
+    aspect_ratio = original_image.width / original_image.height
+
+    if original_image.width > original_image.height:
+        new_width = 800
+        new_height = round(new_width / aspect_ratio)
+    else:
+        new_height = 800
+        new_width = round(new_height * aspect_ratio)
+
+    resized_original = original_image.resize((new_width, new_height), Image.LANCZOS)
+    white_background = Image.new("RGBA", (1024, 1024), "white")
+    x = (1024 - new_width) // 2
+    y = (1024 - new_height) // 2
+    white_background.paste(resized_original, (x, y), resized_original)
+
+    return resized_original, white_background
+
+# Ref: https://www.tensorflow.org/guide/gpu#limiting_gpu_memory_growth
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+    try:
+        tf.config.experimental.set_virtual_device_configuration(
+            gpus[0],
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)]) # Notice here
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Virtual devices must be set before GPUs have been initialized
+        print(e)
+
+ocr_pipeline = keras_ocr.pipeline.Pipeline()
+
+
+zoe = ZoeDetector.from_pretrained("lllyasviel/Annotators").to(device)
+controlnets = [
+    ControlNetModel.from_pretrained(
+        "destitech/controlnet-inpaint-dreamer-sdxl", torch_dtype=torch.float16, variant="fp16"
+    ),
+    ControlNetModel.from_pretrained(
+        "diffusers/controlnet-zoe-depth-sdxl-1.0", torch_dtype=torch.float16
+    ),
+]
+vae = AutoencoderKL.from_pretrained("madebyollin/sdxl-vae-fp16-fix", torch_dtype=torch.float16).to(device)
+first_pipeline = StableDiffusionXLControlNetPipeline.from_pretrained(
+    "SG161222/RealVisXL_V4.0", torch_dtype=torch.float16, variant="fp16", controlnet=controlnets, vae=vae
+).to(device)
+second_pipeline = StableDiffusionXLInpaintPipeline.from_pretrained(
+    "OzzyGT/RealVisXL_V4.0_inpainting",
+    torch_dtype=torch.float16,
+    variant="fp16",
+    vae=vae,
+).to(device)
+
 
 def get_foreground_as_black_oil(source_img, transparent_background):
   replace_main_mask = np.where(transparent_background[:, :, 3] == 0)
@@ -577,18 +656,88 @@ def get_foreground_as_black_oil(source_img, transparent_background):
   main_as_black_oil[replace_main_mask] = source_img[replace_main_mask]
   return main_as_black_oil
 
+def generate_image(prompt, negative_prompt, inpaint_image, zoe_image, seed: int = None):
+    if seed is None:
+        seed = random.randint(0, 2**32 - 1)
+
+    generator = torch.Generator(device="cpu").manual_seed(seed)
+
+    image = first_pipeline(
+        prompt,
+        negative_prompt=negative_prompt,
+        image=[inpaint_image, zoe_image],
+        guidance_scale=6.5,
+        num_inference_steps=25,
+        generator=generator,
+        controlnet_conditioning_scale=[0.5, 0.8],
+        control_guidance_end=[0.9, 0.6],
+    ).images[0]
+
+    return image
+
+def generate_outpaint(prompt, negative_prompt, image, mask, seed: int = None):
+    if seed is None:
+        seed = random.randint(0, 2**32 - 1)
+
+    generator = torch.Generator(device="cpu").manual_seed(seed)
+
+    image = second_pipeline(
+        prompt,
+        negative_prompt=negative_prompt,
+        image=image,
+        mask_image=mask,
+        guidance_scale=8.0,
+        strength=0.8,
+        # num_inference_steps=30,
+        generator=generator,
+    ).images[0]
+
+    return image
+
 
 def REMOVE_INFOGRAPHICS(a_img):
     remove_background = remove_background_func(a_img)
     zeros = np.zeros(remove_background.shape[:2])
     img_text_removed = inpainted_text_mask(
         get_foreground_as_black_oil(a_img, remove_background).astype('float32'),
-        pipeline
+        ocr_pipeline
     )
     return np.array(process_inpaint(
             a_img,
             np.dstack((zeros,) * 3 + (img_text_removed,))
         ))[:, :, ::-1].copy()
+
+
+def GENERATE_BACKGROUND_BY_PROMPT(init_image, text):
+    white_image = remover.process(init_image).convert('RGBA')
+    text = translate_google(text)
+    resized_img, white_bg_image = scale_and_paste(white_image)
+
+    image_zoe = zoe(white_bg_image, detect_resolution=512, image_resolution=1024)
+    prompt = text
+    negative_prompt = ""
+    temp_image = generate_image(prompt, negative_prompt, white_bg_image, image_zoe)
+
+    x = (1024 - resized_img.width) // 2
+    y = (1024 - resized_img.height) // 2
+    temp_image.paste(resized_img, (x, y), resized_img)
+
+    mask = Image.new("L", temp_image.size)
+    mask.paste(resized_img.split()[3], (x, y))
+    mask = ImageOps.invert(mask)
+    final_mask = mask.point(lambda p: p > 128 and 255)
+    mask_blurred = second_pipeline.mask_processor.blur(final_mask, blur_factor=20)
+
+    prompt = text + ", real photo, high detailed"
+    negative_prompt = ""
+
+    final_image = generate_outpaint(prompt, negative_prompt, temp_image, mask_blurred)
+    x = (1024 - resized_img.width) // 2
+    y = (1024 - resized_img.height) // 2
+    final_image.paste(resized_img, (x, y), resized_img)
+
+    return np.array(final_image)
+
 
 def REMOVE_BACKGR(a_img):
     return remover.process(a_img)
